@@ -7,7 +7,9 @@ export function App() {
   async function fetchData() {
     try {
       const response = await fetch(
-        "https://newsapi.org/v2/top-headlines?country=us&apiKey=6eee4d9e91854fff8ff296cdc22efff2"
+        `https://newsapi.org/v2/top-headlines?country=us&apiKey=${
+          import.meta.env.VITE_NEWS_API_KEY
+        }`
       );
       const data = await response.json();
       console.log(data);
@@ -18,7 +20,7 @@ export function App() {
           image: article.urlToImage ?? article.urlToImage,
           author: article.author,
           publishedAt: article.publishedAt,
-          url: article.url
+          url: article.url,
         };
       });
       return article;
