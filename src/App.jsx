@@ -1,48 +1,79 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Header, NewsFeed } from "./components/index";
 import { Container } from "@mui/material";
+import { debounce } from "lodash";
 
 export function App() {
+  const [loading, setLoading] = useState(false);
   const [articles, setArticles] = useState([]);
-  async function fetchData() {
+  const abortControllerRef = useRef(null);
+
+  async function fetchData(searching) {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+    const signal = controller.signal;
+
     try {
       const response = await fetch(
-        `https://newsapi.org/v2/top-headlines?country=us&apiKey=${
+        `https://newsapi.org/v2/top-headlines?q=${searching}&country=us&apiKey=${
           import.meta.env.VITE_NEWS_API_KEY
-        }`
+        }`,
+        { signal }
       );
       const data = await response.json();
-      console.log(data);
-      const article = data.articles.map((article) => {
-        return {
+      const articleList =
+        data.articles &&
+        data.articles.map((article) => ({
           title: article.title,
           description: article.description,
-          image: article.urlToImage ?? article.urlToImage,
+          image: article.urlToImage,
           author: article.author,
           publishedAt: article.publishedAt,
           url: article.url,
-        };
-      });
-      return article;
+        }));
+      return articleList;
     } catch (error) {
-      console.error(error);
+      if (error.name === "AbortError") {
+        console.error(error.name);
+      } else {
+        console.error(error);
+      }
     }
   }
 
   useEffect(() => {
+    setLoading(true);
     async function fetchArticles() {
-      const data = await fetchData();
+      const data = await fetchData("");
       setArticles(data);
+      setLoading(false);
     }
     fetchArticles();
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
   }, []);
 
-  console.log(articles);
+  const debouncedSearch = debounce(async (searchValue) => {
+    setLoading(true);
+    const data = await fetchData(searchValue);
+    setArticles(data);
+    setLoading(false);
+  }, 700);
+
+  function searchBySearch(searchValue) {
+    debouncedSearch(searchValue);
+  }
 
   return (
     <Container style={{ paddingLeft: "16px", paddingRight: "16px" }}>
-      <Header />
-      <NewsFeed articles={articles} />
+      <Header searchBySearch={searchBySearch} />
+      <NewsFeed articles={articles} loading={loading} />
     </Container>
   );
 }

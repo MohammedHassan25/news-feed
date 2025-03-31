@@ -5,61 +5,47 @@ import {
   Select,
   Toolbar,
   Typography,
-  useTheme,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
-import styled from "styled-components";
+import { styled } from "@mui/material/styles";
 
-const Search = styled("div")(() => {
-  const muiTheme = useTheme();
-  return {
-    position: "relative",
-    borderRadius: muiTheme.shape.borderRadius,
-    backgroundColor: "white",
-    marginLeft: 0,
-    [muiTheme.breakpoints.up("sm")]: {
-      marginLeft: muiTheme.spacing(1),
-      width: "auto",
-    },
-  };
-});
+const Search = styled("div")(({ theme }) => ({
+  position: "relative",
+  borderRadius: theme.shape.borderRadius,
+  backgroundColor: theme.palette.common.white,
+  "&:hover": {
+    backgroundColor: theme.palette.common.white,
+  },
+  marginLeft: "auto",
+  width: 200,
+}));
+const SearchIconWrapper = styled("div")(({ theme }) => ({
+  padding: theme.spacing(0, 2),
+  height: "100%",
+  position: "absolute",
+  pointerEvents: "none",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+}));
+const StyledInputBase = styled(InputBase)(({ theme }) => ({
+  color: theme.palette.text.primary,
+  "& .MuiInputBase-input": {
+    padding: theme.spacing(1, 1, 1, 5),
+    transition: theme.transitions.create("width"),
+    width: "100%",
+  },
+}));
 
-const SearchIconWrapper = styled("div")(() => {
-  const muiTheme = useTheme();
-  return {
-    padding: muiTheme.spacing(0, 2),
-    height: "100%",
-    position: "absolute",
-    pointerEvents: "none",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    color: "#0000008a", // Update color here
-  };
-});
-
-const StyledInputBase = styled(InputBase)(() => {
-  const muiTheme = useTheme(); // Use the useTheme hook
-  return {
-    color: "0000008a",
-    "& .MuiInputBase-input": {
-      padding: muiTheme.spacing(1, 1, 1, 0),
-      // vertical padding + font size from searchIcon
-      paddingLeft: `calc(1em + ${muiTheme.spacing(4)})`,
-      transition: muiTheme.transitions.create("width"),
-      width: "100%",
-      [muiTheme.breakpoints.up("sm")]: {
-        width: "20ch",
-      },
-    },
-  };
-});
-
-export function Header() {
+export function Header(props) {
+  const { searchBySearch } = props;
+  function handleInputChange(e) {
+    searchBySearch(e.target.value);
+  }
   return (
     <AppBar style={{ height: "72px", position: "static" }}>
       <Toolbar sx={{ display: "flex", height: "inherit" }}>
-        <Typography variant="h6" component="div" sx={{  }}>
+        <Typography variant="h6" component="div" sx={{}}>
           NewsFeed App
         </Typography>
         <Select
@@ -68,7 +54,7 @@ export function Header() {
             width: "200px",
             height: "40px",
             outline: "none",
-            margin: "16px"
+            margin: "16px",
           }}
           labelId="demo-simple-select-helper-label"
           id="demo-simple-select-helper"
@@ -83,13 +69,14 @@ export function Header() {
           <MenuItem value="sports">Sports </MenuItem>
           <MenuItem value="technology">Technology </MenuItem>
         </Select>
-        <Search style={{marginLeft: "auto"}}>
+        <Search>
           <SearchIconWrapper>
-            <SearchIcon />
+            <SearchIcon color="action" />
           </SearchIconWrapper>
           <StyledInputBase
             placeholder="Search…"
             inputProps={{ "aria-label": "search" }}
+            onChange={handleInputChange}
           />
         </Search>
       </Toolbar>
