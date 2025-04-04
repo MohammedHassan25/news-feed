@@ -12,7 +12,7 @@ const Footer = styled("footer")(({ theme }) => ({
 
 export function App() {
   const [loading, setLoading] = useState(true);
-  const [articles, setArticles] = useState([]);
+  const [articles, setArticles] = useState(null);
   const [error, setError] = useState(null);
   const abortControllerRef = useRef(null);
   const page = useRef(1);
@@ -20,6 +20,7 @@ export function App() {
   const searchingByCategory = useRef("general");
 
   const fetchData = useCallback(async () => {
+    setLoading(true);
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
     }
@@ -27,7 +28,6 @@ export function App() {
     abortControllerRef.current = controller;
     const signal = controller.signal;
     try {
-      setLoading(true);
       const response = await fetch(
         `https://newsapi.org/v2/top-headlines?country=us&category=${
           searchingByCategory.current
@@ -72,7 +72,7 @@ export function App() {
   const searchBySearch = debounce(async () => {
     page.current = 1;
     fetchArticles();
-  }, 700);
+  }, 500);
 
   const searchByCategory = () => {
     page.current = 1;
@@ -99,7 +99,7 @@ export function App() {
         searchingByCategory={searchingByCategory}
         searchByCategory={searchByCategory}
       />
-      {loading ? (
+      {loading || articles === null ? (
         [...Array(5)].map((_, index) => <LoadingArticles key={index} />)
       ) : (
         <NewsFeed articles={articles} loading={loading} error={error} />

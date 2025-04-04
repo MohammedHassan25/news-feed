@@ -5,31 +5,39 @@ import CardMedia from "@mui/material/CardMedia";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import { StyledCard } from "../index";
+import { styled } from "@mui/material/styles";
+
+const Link = styled("a")(({ theme }) => ({
+  textDecoration: "none",
+  color: theme.palette.text.primary,
+}));
 
 export const NewsCard = React.memo(function NewsCard({ article }) {
   return (
     <StyledCard>
-      <CardActionArea>
-        {article.image && (
-          <CardMedia
-            component="img"
-            height="200"
-            image={article.image}
-            alt={article.title}
-            loading="lazy"
-          />
-        )}
-        <CardContent>
-          <Typography gutterBottom variant="h6" component="div">
-            {article.title}
-          </Typography>
-          {article.description && (
-            <Typography variant="body2" color="textSecondary">
-              {article.description}
-            </Typography>
+      <Link href={article.url} target="_blank" rel="noopener noreferrer">
+        <CardActionArea>
+          {article.image && (
+            <CardMedia
+              component="img"
+              height="200"
+              image={article.image}
+              alt={article.title}
+              loading="lazy"
+            />
           )}
-        </CardContent>
-      </CardActionArea>
+          <CardContent>
+            <Typography gutterBottom variant="h6" component="div">
+              {article.title}
+            </Typography>
+            {article.description && (
+              <Typography variant="body2" color="textSecondary">
+                {article.description}
+              </Typography>
+            )}
+          </CardContent>
+        </CardActionArea>
+      </Link>
       <Box p={2}>
         <Typography variant="caption" color="textSecondary" display="block">
           {article.author}
