@@ -38,14 +38,14 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }));
 
 export function Header(props) {
-  const { searchBySearch } = props;
   function handleInputChange(e) {
-    searchBySearch(e.target.value);
+    props.searching.current = e.target.value;
+    props.searchBySearch();
   }
   return (
     <AppBar style={{ height: "72px", position: "static" }}>
       <Toolbar sx={{ display: "flex", height: "inherit" }}>
-        <Typography variant="h6" component="div" sx={{}}>
+        <Typography variant="h6" component="div">
           NewsFeed App
         </Typography>
         <Select
