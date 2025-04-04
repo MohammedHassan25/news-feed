@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import { Header, NewsFeed } from "./components/index";
+import { Header, LoadingArticles, NewsFeed } from "./components/index";
 import { Button, Container } from "@mui/material";
 import { debounce } from "lodash";
 import { styled } from "@mui/material/styles";
@@ -99,7 +99,11 @@ export function App() {
   return (
     <Container style={{ paddingLeft: "16px", paddingRight: "16px" }}>
       <Header searching={searching} searchBySearch={searchBySearch} />
-      <NewsFeed articles={articles} loading={loading} error={error} />
+      {loading ? (
+        [...Array(5)].map((_, index) => <LoadingArticles key={index} />)
+      ) : (
+        <NewsFeed articles={articles} loading={loading} error={error} />
+      )}
       <Footer>
         <Button
           variant="outlined"

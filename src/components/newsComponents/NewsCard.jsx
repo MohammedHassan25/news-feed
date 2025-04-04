@@ -1,14 +1,9 @@
-import Card from "@mui/material/Card";
 import CardActionArea from "@mui/material/CardActionArea";
 import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
-import { styled } from "@mui/material/styles";
-
-const StyledCard = styled(Card)(({ theme }) => ({
-  margin: theme.spacing(2, 0),
-}));
+import { StyledCard } from "../index";
 
 export function NewsCard({ article }) {
   return (

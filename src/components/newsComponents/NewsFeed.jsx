@@ -1,19 +1,8 @@
-import { Box, CircularProgress, Typography } from "@mui/material";
-import { NewsCard } from "./NewsCard";
+import { Typography } from "@mui/material";
+import { NewsCard } from "../index";
 
 export function NewsFeed({ articles, loading, error }) {
-  if (loading && (!articles || articles.length === 0)) {
-    return (
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        height="50vh"
-      >
-        <CircularProgress />
-      </Box>
-    );
-  } else if (!loading && articles?.length === 0) {
+  if (!loading && articles?.length === 0) {
     return (
       <Typography
         variant="h4"
