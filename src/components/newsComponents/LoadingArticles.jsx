@@ -1,3 +1,4 @@
+import React from "react";
 import {
   Box,
   Card,
@@ -11,7 +12,7 @@ export const StyledCard = styled(Card)(({ theme }) => ({
   margin: theme.spacing(2, 0),
 }));
 
-export function LoadingArticles() {
+export const LoadingArticles = React.memo(function LoadingArticles() {
   return (
     <StyledCard>
       <CardActionArea>
@@ -26,4 +27,4 @@ export function LoadingArticles() {
       </Box>
     </StyledCard>
   );
-}
+});

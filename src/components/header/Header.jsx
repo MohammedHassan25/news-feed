@@ -1,3 +1,4 @@
+import React from "react";
 import {
   AppBar,
   InputBase,
@@ -8,6 +9,26 @@ import {
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import { styled } from "@mui/material/styles";
+
+const StyledSelect = styled(Select)(({ theme }) => ({
+  color: theme.palette.action,
+  backgroundColor: theme.palette.common.white,
+  "&:before": {
+    borderColor: theme.palette.action,
+  },
+  "&:after": {
+    borderColor: theme.palette.action,
+  },
+  "& .MuiSelect-icon": {
+    color: theme.palette.action,
+  },
+  margin: theme.spacing(2),
+  width: 200,
+  height: 40,
+}));
+const StyledMenuItem = styled(MenuItem)(({ theme }) => ({
+  color: theme.palette.text.primary,
+}));
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
@@ -37,38 +58,36 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
-export function Header(props) {
-  function handleInputChange(e) {
+export const Header = React.memo(function Header(props) {
+  const handleInputChange = (e) => {
     props.searching.current = e.target.value;
     props.searchBySearch();
   }
+
+  function handleCategoryChange(e) {
+    props.searchingByCategory.current = e.target.value;
+    props.searchByCategory();
+  }
+
   return (
     <AppBar style={{ height: "72px", position: "static" }}>
       <Toolbar sx={{ display: "flex", height: "inherit" }}>
         <Typography variant="h6" component="div">
           NewsFeed App
         </Typography>
-        <Select
-          style={{
-            backgroundColor: "white",
-            width: "200px",
-            height: "40px",
-            outline: "none",
-            margin: "16px",
-          }}
-          labelId="demo-simple-select-helper-label"
-          id="demo-simple-select-helper"
-          label="Age"
+        <StyledSelect
           defaultValue="general"
+          onChange={handleCategoryChange}
+          MenuProps={{ disableScrollLock: true }}
         >
-          <MenuItem value="general">General</MenuItem>
-          <MenuItem value="business">Business</MenuItem>
-          <MenuItem value="entertainment">Entertainment</MenuItem>
-          <MenuItem value="health">Health</MenuItem>
-          <MenuItem value="science">Science </MenuItem>
-          <MenuItem value="sports">Sports </MenuItem>
-          <MenuItem value="technology">Technology </MenuItem>
-        </Select>
+          <StyledMenuItem value="general">General</StyledMenuItem>
+          <StyledMenuItem value="business">Business</StyledMenuItem>
+          <StyledMenuItem value="entertainment">Entertainment</StyledMenuItem>
+          <StyledMenuItem value="health">Health</StyledMenuItem>
+          <StyledMenuItem value="science">Science</StyledMenuItem>
+          <StyledMenuItem value="sports">Sports</StyledMenuItem>
+          <StyledMenuItem value="technology">Technology</StyledMenuItem>
+        </StyledSelect>
         <Search>
           <SearchIconWrapper>
             <SearchIcon color="action" />
@@ -82,4 +101,4 @@ export function Header(props) {
       </Toolbar>
     </AppBar>
   );
-}
+});

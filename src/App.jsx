@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import { Header, LoadingArticles, NewsFeed } from "./components/index";
 import { Button, Container } from "@mui/material";
 import { debounce } from "lodash";
@@ -17,8 +17,9 @@ export function App() {
   const abortControllerRef = useRef(null);
   const page = useRef(1);
   const searching = useRef("");
+  const searchingByCategory = useRef("general");
 
-  async function fetchData() {
+  const fetchData = useCallback(async () => {
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
     }
@@ -28,77 +29,76 @@ export function App() {
     try {
       setLoading(true);
       const response = await fetch(
-        `https://newsapi.org/v2/top-headlines?country=us&pageSize=5&q=${
-          searching.current
-        }&page=${page.current}&apiKey=${import.meta.env.VITE_NEWS_API_KEY}`,
+        `https://newsapi.org/v2/top-headlines?country=us&category=${
+          searchingByCategory.current
+        }&pageSize=5&q=${searching.current}&page=${page.current}&apiKey=${
+          import.meta.env.VITE_NEWS_API_KEY
+        }`,
         { signal }
       );
       const data = await response.json();
       if (!response.ok) {
-        if (response.status === 401) {
-          throw new Error(data.message);
-        } else if (response.status === 429) {
-          throw new Error("Too many requests. Please try again later.");
-        } else if (response.status === 404) {
-          throw new Error("Not Found.");
-        } else if (!response.status) {
-          console.log("Network error");
-          setLoading(false);
-          return;
-        } else {
-          throw new Error("An error occurred. Please try again later.");
-        }
+        throw new Error(data.message || "An error occurred.");
       }
       const articleList =
-        data.articles &&
-        data.articles.map((article) => ({
+        data.articles?.map((article) => ({
           title: article.title,
           description: article.description,
           image: article.urlToImage,
           author: article.author,
           publishedAt: article.publishedAt,
           url: article.url,
-        }));
+        })) || [];
       setError(null);
       return articleList;
     } catch (error) {
-      if (error.name === "AbortError") {
-        return;
+      if (error.name !== "AbortError") {
+        setError(error.message);
       }
-      setError(error.message);
     } finally {
       setLoading(false);
     }
-  }
-
-  useEffect(() => {
-    async function fetchArticles() {
-      const data = await fetchData();
-      setArticles(data);
-    }
-    fetchArticles();
   }, []);
 
-  const searchBySearch = debounce(async () => {
+  const fetchArticles = useCallback(async () => {
     const data = await fetchData();
-    setArticles(data);
+    setArticles(data || []);
+  }, [fetchData]);
+
+  useEffect(() => {
+    fetchArticles();
+  }, [fetchArticles]);
+
+  const searchBySearch = debounce(async () => {
+    page.current = 1;
+    fetchArticles();
   }, 700);
+
+  const searchByCategory = () => {
+    page.current = 1;
+    fetchArticles();
+  };
 
   const previousChangeHandler = () => {
     if (page.current > 1) {
       page.current -= 1;
-      searchBySearch();
+      fetchArticles();
     }
   };
 
   const nextChangeHandler = () => {
     page.current += 1;
-    searchBySearch();
+    fetchArticles();
   };
 
   return (
     <Container style={{ paddingLeft: "16px", paddingRight: "16px" }}>
-      <Header searching={searching} searchBySearch={searchBySearch} />
+      <Header
+        searching={searching}
+        searchBySearch={searchBySearch}
+        searchingByCategory={searchingByCategory}
+        searchByCategory={searchByCategory}
+      />
       {loading ? (
         [...Array(5)].map((_, index) => <LoadingArticles key={index} />)
       ) : (
@@ -126,4 +126,4 @@ export function App() {
   );
 }
 
-export default App;
+export default React.memo(App);

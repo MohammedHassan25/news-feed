@@ -1,7 +1,12 @@
+import React from "react";
 import { Typography } from "@mui/material";
 import { NewsCard } from "../index";
 
-export function NewsFeed({ articles, loading, error }) {
+export const NewsFeed = React.memo(function NewsFeed({
+  articles,
+  loading,
+  error,
+}) {
   if (!loading && articles?.length === 0) {
     return (
       <Typography
@@ -27,6 +32,7 @@ export function NewsFeed({ articles, loading, error }) {
             key={article.url || index}
             href={article.url}
             style={{ textDecoration: "none" }}
+            target="_blank"
           >
             <NewsCard article={article} />
           </a>
@@ -34,4 +40,4 @@ export function NewsFeed({ articles, loading, error }) {
       </>
     );
   }
-}
+});
