@@ -11,8 +11,9 @@ const Footer = styled("footer")(({ theme }) => ({
 }));
 
 export function App() {
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [articles, setArticles] = useState([]);
+  const [error, setError] = useState(null);
   const abortControllerRef = useRef(null);
   const page = useRef(1);
   const searching = useRef("");
@@ -25,6 +26,7 @@ export function App() {
     abortControllerRef.current = controller;
     const signal = controller.signal;
     try {
+      setLoading(true);
       const response = await fetch(
         `https://newsapi.org/v2/top-headlines?country=us&pageSize=5&q=${
           searching.current
@@ -32,6 +34,21 @@ export function App() {
         { signal }
       );
       const data = await response.json();
+      if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error(data.message);
+        } else if (response.status === 429) {
+          throw new Error("Too many requests. Please try again later.");
+        } else if (response.status === 404) {
+          throw new Error("Not Found.");
+        } else if (!response.status) {
+          console.log("Network error");
+          setLoading(false);
+          return;
+        } else {
+          throw new Error("An error occurred. Please try again later.");
+        }
+      }
       const articleList =
         data.articles &&
         data.articles.map((article) => ({
@@ -42,36 +59,29 @@ export function App() {
           publishedAt: article.publishedAt,
           url: article.url,
         }));
+      setError(null);
       return articleList;
     } catch (error) {
       if (error.name === "AbortError") {
-        console.error(error.name);
-      } else {
-        console.error(error);
+        return;
       }
+      setError(error.message);
+    } finally {
+      setLoading(false);
     }
   }
 
   useEffect(() => {
-    setLoading(true);
     async function fetchArticles() {
       const data = await fetchData();
       setArticles(data);
-      setLoading(false);
     }
     fetchArticles();
-    return () => {
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort();
-      }
-    };
   }, []);
 
   const searchBySearch = debounce(async () => {
-    setLoading(true);
     const data = await fetchData();
     setArticles(data);
-    setLoading(false);
   }, 700);
 
   const previousChangeHandler = () => {
@@ -89,7 +99,7 @@ export function App() {
   return (
     <Container style={{ paddingLeft: "16px", paddingRight: "16px" }}>
       <Header searching={searching} searchBySearch={searchBySearch} />
-      <NewsFeed articles={articles} loading={loading} />
+      <NewsFeed articles={articles} loading={loading} error={error} />
       <Footer>
         <Button
           variant="outlined"
