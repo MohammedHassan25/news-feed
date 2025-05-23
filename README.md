@@ -1,12 +1,13 @@
-# React + Vite
+# NEWS FEED APP
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+- This application is designed to display daily US news as it happens, based on data from "https://newsapi.org".
 
-Currently, two official plugins are available:
+## Note:
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Note: Because this API requires an Upgrade, we have allocated a specific data set for each day to display the data on the website. However, this news will be outdated and not functional with category and pagination, as there are no updates to this news due to Upgrade requirements. We apologize for this inconvenience.
 
-## Expanding the ESLint configuration
+### LINK :
 
-If you are developing a production application, we recommend using TypeScript and enable type-aware lint rules. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- https://news-feed-tau.vercel.app/
+
+#### HAVE NICE DAY 😉✨
