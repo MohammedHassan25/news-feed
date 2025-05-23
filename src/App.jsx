@@ -28,14 +28,19 @@ export function App() {
     abortControllerRef.current = controller;
     const signal = controller.signal;
     try {
-      const response = await fetch(
+      const dataApi =
         `https://newsapi.org/v2/top-headlines?country=us&category=${
           searchingByCategory.current
         }&pageSize=5&q=${searching.current}&page=${page.current}&apiKey=${
           import.meta.env.VITE_NEWS_API_KEY
-        }`,
-        { signal }
-      );
+        }`
+          ? `https://newsapi.org/v2/top-headlines?country=us&category=${
+              searchingByCategory.current
+            }&pageSize=5&q=${searching.current}&page=${page.current}&apiKey=${
+              import.meta.env.VITE_NEWS_API_KEY
+            }`
+          : "./data.json";
+      const response = await fetch(dataApi, { signal });
       const data = await response.json();
       if (!response.ok) {
         throw new Error(data.message || "An error occurred.");
