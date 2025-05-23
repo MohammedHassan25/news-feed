@@ -3,6 +3,7 @@ import { Header, LoadingArticles, NewsFeed } from "./components/index";
 import { Button, Container } from "@mui/material";
 import { debounce } from "lodash";
 import { styled } from "@mui/material/styles";
+import dataAPI from "./data.json";
 
 const Footer = styled("footer")(({ theme }) => ({
   padding: theme.spacing(2, 0),
@@ -27,39 +28,44 @@ export function App() {
     const controller = new AbortController();
     abortControllerRef.current = controller;
     const signal = controller.signal;
+
     try {
-      const dataApi =
-        `https://newsapi.org/v2/top-headlines?country=us&category=${
-          searchingByCategory.current
-        }&pageSize=5&q=${searching.current}&page=${page.current}&apiKey=${
-          import.meta.env.VITE_NEWS_API_KEY
-        }`
-          ? `https://newsapi.org/v2/top-headlines?country=us&category=${
-              searchingByCategory.current
-            }&pageSize=5&q=${searching.current}&page=${page.current}&apiKey=${
-              import.meta.env.VITE_NEWS_API_KEY
-            }`
-          : "./data.json";
-      const response = await fetch(dataApi, { signal });
-      const data = await response.json();
+      const url = `https://newsapi.org/v2/top-headlines?country=us&category=${
+        searchingByCategory.current
+      }&pageSize=5&q=${searching.current}&page=${page.current}&apiKey=${
+        import.meta.env.VITE_NEWS_API_KEY
+      }`;
+
+      const response = await fetch(url, { signal });
       if (!response.ok) {
-        throw new Error(data.message || "An error occurred.");
+        throw new Error(`Fetch error: ${response.status}`);
       }
-      const articleList =
-        data.articles?.map((article) => ({
+
+      const data = await response.json();
+      const articleList = (data.articles || []).map((article) => ({
+        title: article.title,
+        description: article.description,
+        image: article.urlToImage,
+        author: article.author,
+        publishedAt: article.publishedAt,
+        url: article.url,
+      }));
+
+      setError(null);
+      return articleList;
+    } catch (err) {
+      if (err.name !== "AbortError") {
+        setError(err.message);
+        return dataAPI.articles.map((article) => ({
           title: article.title,
           description: article.description,
           image: article.urlToImage,
           author: article.author,
           publishedAt: article.publishedAt,
           url: article.url,
-        })) || [];
-      setError(null);
-      return articleList;
-    } catch (error) {
-      if (error.name !== "AbortError") {
-        setError(error.message);
+        }));
       }
+      return [];
     } finally {
       setLoading(false);
     }
