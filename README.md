@@ -4,7 +4,7 @@
 
 ## Note:
 
-- Note: Because this API requires an Upgrade, we have allocated a specific data set for each day to display the data on the website. However, this news will be outdated and not functional with category and pagination, as there are no updates to this news due to Upgrade requirements. We apologize for this inconvenience.
+- Note: Because this API requires an Upgrade, we have allocated a specific data set for each day to display the data on the website. However, this news will be outdated and not functional with category and pagination, as there are no updates to this news due to Upgrade requirements.
 
 ### LINK :
 
